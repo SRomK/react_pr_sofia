@@ -1,65 +1,86 @@
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from 'react';
+import MovieCard from './MovieCard';
 import './App.css';
+import SearchIcon from './search.svg';
 
+const API_URL = 'http://www.omdbapi.com?apikey=336b3473'; //static variable to call the api
 
 const App = () => {
-  const [counter, setCounter] = useState(0);
+    const [movies, setMovies] = useState([]); //default value of the useState is an empty array
+    const [searchTerm, setSearchTerm] = useState([]);
+    const searchMovies = async (title) => {
+        const response = await fetch(`${API_URL}&s=${title}`);
+        const data = await response.json(); //inside of this data object we should have the data about the movies
 
+        //console.log(data.Search); //now instead of consolelogging we can pass the data.Search into our setMovies
+        setMovies(data.Search);
+    }
+    useEffect(() => {
+        searchMovies('Spiderman');
+    }, []);
 
-  useEffect(() => {
-    alert('You have changed the counter to ' + counter)
-  }, [counter]);
-  /*
-  useEffect(() => {
-    setCounter(100);
-  }, []);
-  */
-  //accepts a callback function as the first paramete r
-
-  return (
-    <div className="App">
-       <button onClick={() => setCounter((prevCount) => prevCount - 1)}>-</button>
-       <h1>{counter}</h1>
-       <button onClick={() => setCounter((prevCount) => prevCount + 1)}>+</button>
-    </div>
-  );
-}
-/*<h1>Hello, {isNameShowing ? name : 'someone'}!</h1> 
-
-<h1>Hello, {2 + 2}!</h1>
-     {name ? (
-       <>
-       <h1>{name}</h1>
-       </>
-     ) : (
-       <>
-       <h1>test</h1>
-       <h2>There is no name</h2>
-       </>
-     )}
-     
-
-      Person component:
-
-      const Person = (props) => {
-  return (
-    <> 
-      <h1>Name: {props.name}</h1>
-      <h2>Last Name: {props.lastName}</h2>
-      <h2>Age: {props.age}</h2>
-    </>
-  )
+    return (
+        <div className="app">
+            <h1>MovieLand</h1>
+            <div className="search">
+                <input
+                    placeholder="Search for movies"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <img
+                    src={SearchIcon}
+                    alt="search"
+                    onClick={() => searchMovies(searchTerm)}
+                />
+            </div>
+            {movies?.length > 0
+                ? (
+                    <div className="container">
+                        {movies.map((movie) => (
+                            <MovieCard movie={movie} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="empty">
+                        <h2>No movies found</h2>
+                    </div>
+                )}
+        </div>
+    );
 }
 
-
-
-
-     
-     <Person 
-      name ='John' 
-      lastName='Doe' 
-      age={25}
-    />
-     <Person name='Ellie' lastName='Doe' age={24}/>*/
 export default App;
+
+
+/*{
+                movies?.length > 0
+                    ? (
+                        <div className="container">
+                        <MovieCard movie1={movie1}/>
+                    </div>
+                    ) : (
+                        <div className="empty">
+                            <h2>No movies found</h2>
+                        </div>
+                    )
+            } -----> instead of showing this one single card we can a dinamyc block of code and map over movies
+by saying movies.map and map over them. We usually map over arrays that are plural and inside of there we are gonna get a singular movie for it iteration of the map
+so for each iteration of the map we want to render a moviecard component with its movie prop
+and with that we are dinamically looping over our movies array which is fetch from an API and we are
+taking each individual movie and dinamically passing it as a prop to our MovieCard.*/
+
+
+
+/*
+<img
+                    src={SearchIcon}
+                    alt="search"
+                    onClick={() => searchMovies(searchTerm)}
+                />
+
+
+    this way we can recall our searchMovies function and pass it a new title by
+    calling searchMovies and we pass the searchTerm inside instead of an static title
+*/
